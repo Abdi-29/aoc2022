@@ -22,7 +22,7 @@ vector<int> part_one(ifstream& file) {
     return result;
 }
 
-vector<int> part_two(vector<int> result) {
+vector<int> part_two(vector<int>& result) {
     std::sort(result.begin(), result.end());
     vector<int> tmp(result.end() - 3, result.end());
     return tmp;
@@ -39,11 +39,11 @@ int main(int argc, char **argv) {
         return 1;
     }
     vector<int> result = part_one(file);
-    cout << "part_one = " << *std::max_element(result.begin(), result.end())  << endl;
     vector<int> result2 = part_two(result);
     int sum = 0;
     for (auto &n: result2) {
         sum += n;
     }
+    cout << "part_one = " << *std::max_element(result.begin(), result.end())  << endl;
     cout << "part_two = " << sum << endl;
 }
