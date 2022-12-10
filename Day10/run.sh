@@ -1,0 +1,1 @@
+clang++ day10.cpp
