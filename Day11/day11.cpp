@@ -5,13 +5,15 @@
 #include <unordered_set>
 #include <utility>
 #include <cmath>
+#include <algorithm>
+#include <gmpxx.h>
 
 using namespace std;
 
 class Day11 {
 private:
     vector<Day11> _monkeys;
-    vector<int> _items;
+    vector<long long> _items;
     int _left;
     int _right;
     int _test;
@@ -19,6 +21,7 @@ private:
     string  _name;
     char _sign;
     int _result;
+    long long _lcm;
 
 public:
     void	skipWhiteSpaces(std::istream& file) {
@@ -31,7 +34,7 @@ public:
             if(isdigit(x)) {
                 num += x;
             } else if(!num.empty()){
-                _items.push_back(stoi(num));
+                _items.push_back(stoll(num));
                 num = string();
             }
         }
@@ -41,6 +44,7 @@ public:
     }
 
     void solve(ifstream& file) {
+        _lcm = 1;
         string line;
         Day11 monkey;
         monkey._name = _name;
@@ -49,37 +53,36 @@ public:
             skipWhiteSpaces(file);
         }
         monkey._result = 0;
+        _lcm *= monkey._test;
         _monkeys.push_back(monkey);
-        for(auto& x: _monkeys) {
-
-            cout << x._sign << endl;
-        }
         rounds();
+        vector<int> ans;
         for(auto &x: _monkeys) {
-            cout << x._result << " ";
+            ans.push_back(x._result);
         }
+        sort(ans.begin(), ans.end());
+        cout << "test: " << ans[6] << " " <<  ans[7] << endl;
+        long long part_two = ans[6] * ans[7];
+        cout << "part_one: " << part_two << endl;
     }
 
     void do_math(Day11& monkey) {
         int operation;
+        monkey._result += monkey._items.size();
         for(auto& x: monkey._items) {
         monkey._operation.find("old") != string::npos ? operation = x : operation = stoi(monkey._operation);
             monkey._sign == '*' ? x *= operation : x += operation;
-            double tmp = (x / 3);
-            tmp = round(tmp);
-            x = tmp;
+            x %= _lcm;
             if(x % monkey._test == 0) {
                 _monkeys[monkey._left]._items.push_back(x);
-                _monkeys[monkey._left]._result++;
             } else {
                 _monkeys[monkey._right]._items.push_back(x);
-                _monkeys[monkey._right]._result++;
             }
         }
         monkey._items.clear();
     }
     void rounds() {
-        for(size_t i = 0; i < 20; ++i) {
+        for(size_t i = 0; i < 10000; ++i) {
             for(size_t j = 0; j < _monkeys.size(); ++j) {
                 if (_monkeys[j]._items.empty()) {
                     continue;
@@ -113,6 +116,7 @@ public:
                 break;
             case 'T':
                 monkey._test = stoi(line.substr(19));
+                _lcm *= monkey._test;
                 break;
             default:
               if(line.find("true") != string::npos) {
