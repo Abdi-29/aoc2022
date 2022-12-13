@@ -26,63 +26,65 @@ public:
         while(!_queues.empty()) {
             pair<pair<int, int>, int> current = _queues.front();
             _queues.pop();
+            if(visited[current.first.first][current.first.second]) {
+                continue;
+            }
+            visited[current.first.first][current.first.second] = true;
+            if(current.first.first == _destination.first && current.first.second == _destination.second) {
+                cout << "found it: ========================= " << current.second << endl;
+                return;
+            }
             update_neighbours(current, visited);
         }
     }
 
     void update_neighbours(const pair<pair<int, int>, int>& current, bool **visited) {
-        _x = current.first.first, _y = current.first.second;
-        int count = current.second;
-        visited[_x][_y] = true;
-        cout << _x << " " << _y << endl;
-        pair<int, int> tmp = make_pair(_x, _y);
-        if(_x - 1 >= 0 && !visited[_x - 1][_y]) {
-            tmp.first--;
-            cout << "boolean: " << visited[_x - 1][_y] << endl;
-            _queues.push(make_pair(tmp, count++));
-            cout << "neighbours: " << _x - 1 << " " << _y << endl;
-        }
-        if (_x + 1 < _graph.size() && !visited[_x + 1][_y]) {
-            tmp.first++;
-            _queues.push(make_pair(tmp, count++));
-            cout << "nei: " << _x + 1 << " " << _y << endl;
-        }
-        if(_y - 1 > 0 && !visited[_x][_y - 1]) {
-            tmp.second--;
-            _queues.push(make_pair(tmp, count++));
-            cout << "neighbours2222: " << _x << " " << _y - 1 << endl;
-        }
-        if (_y + 1 < _graph[0].size() && !visited[_x][_y + 1]) {
-            tmp.second++;
-            _queues.push(make_pair(tmp, count++));
-            cout << "nei222: " << _x << " " << _y + 1 << endl;
-        }
-        cout << "testing\n";
-        static int n = 0;
-        if(n++ == 2)
-        exit(0);
+        const vector<pair<int, int>> neighbours = {
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1}
+        };
+        int col = _graph.size();
+        int raw = _graph[0].size();
+        for(auto& neighbour: neighbours) {
+            int x = current.first.first + neighbour.first;
+            int y = current.first.second + neighbour.second;
+            if (x < 0 || y < 0 || x >= col || y >= raw) {
+                continue;    
+            } 
+            if (_graph[x][y] <= _graph[current.first.first][current.first.second] + 1) {
+                _queues.emplace(make_pair(x, y), current.second + 1);
+            }
+    }
     }
 
     void parse(ifstream& file) {
         int x = 0, y = 0;
-        bool find = false;
+        bool start = false, end = false;
         string line;
         while(getline(file, line)) {
-            if(!find) {
+            if(!start || !end) {
                 if((y = line.find("S")) != string::npos) {
                     _position.first = x;
                     _position.second = y;
-                    find = true;
+                    start = true;
+                } else if((y = line.find("E")) != string::npos){
+                    _destination.first = x;
+                    _destination.second = y;
+                    end = true;
                 }
             }
             x++;
             _graph.push_back(line);
         }
+        _graph[_position.first][_position.second] = 'a';
+        _graph[_destination.first][_destination.second] = 'z';
     }
 
 private:
     vector<string> _graph;
-    pair<int, int>  _position;
+    pair<int, int>  _position, _destination;
     queue<pair<pair<int, int>, int> > _queues;
     int _x, _y;
 };
