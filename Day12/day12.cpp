@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include <queue>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -10,14 +11,25 @@ class Day12 {
 public:
     void solve(ifstream& file) {
         parse(file);
-        bfs();
+        cout << "part_one: " << bfs() << endl;
+        int shortest_path = INT_MAX;
+        for(size_t i = 0; i < _graph.size(); ++i) {
+            for(size_t j = 0; j < _graph[0].size(); ++j) {
+                if(_graph[i][j] == 'a') {
+                    _queues = {};
+                    _position = {i, j};
+                    shortest_path = min(shortest_path, bfs());
+                }
+            }
+        }
+        cout << "second_part: " << shortest_path << endl;
     }
 
-    void bfs() {
-        int x = _graph[0].size(), y = _graph.size();
+    int bfs() {
+        int x = _graph.size(), y = _graph[0].size();
         bool **visited = new bool*[_graph.size()];
         for(size_t i = 0; i < x; i++) {
-            visited[i] = new bool[x];
+            visited[i] = new bool[y];
             for(size_t j = 0; j < y; ++j) {
                 visited[i][j] = false;
             }
@@ -31,11 +43,11 @@ public:
             }
             visited[current.first.first][current.first.second] = true;
             if(current.first.first == _destination.first && current.first.second == _destination.second) {
-                cout << "found it: ========================= " << current.second << endl;
-                return;
+               return current.second;
             }
             update_neighbours(current, visited);
         }
+        return INT_MAX;
     }
 
     void update_neighbours(const pair<pair<int, int>, int>& current, bool **visited) {
@@ -69,7 +81,7 @@ public:
                     _position.first = x;
                     _position.second = y;
                     start = true;
-                } else if((y = line.find("E")) != string::npos){
+                } if((y = line.find("E")) != string::npos){
                     _destination.first = x;
                     _destination.second = y;
                     end = true;
@@ -86,7 +98,6 @@ private:
     vector<string> _graph;
     pair<int, int>  _position, _destination;
     queue<pair<pair<int, int>, int> > _queues;
-    int _x, _y;
 };
 
 int main(int argc, char **argv) {
