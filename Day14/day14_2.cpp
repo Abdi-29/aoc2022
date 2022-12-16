@@ -39,8 +39,13 @@ public:
         }
         int x = 500, y = 0, result = 0;
         while(true) {
-            cout << "lol: " << _row << "    " << y << endl;
-            if(y > _row) break;
+            // cout << "lol: " << _row << "    " << y << endl;
+            if(y == _row + 1) {
+                _map[y][x] = 'o';
+                x = 500;
+                y = 0;
+                result++;
+            }
             //check down
             if(_map[y + 1][x] == '.') {
                 y++;
@@ -56,15 +61,14 @@ public:
                 y++;
             } else {
                 result++;
-                if(x == 500 && y = 0) break;
+                if(x == 500 && y == 0) break;
                 _map[y][x] = 'o';
                 x = 500;
                 y = 0;
-
             }
         }
         create_file();
-        cout << "part_one: " << result << endl;
+        cout << "part_two: " << result << endl;
     }
 
     vector<string> split(string& s, const string& del) {
